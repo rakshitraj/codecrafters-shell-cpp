@@ -10,7 +10,7 @@ void read_input(std::string& input){
 
 void command(const std::string& input){
   // Command dictionary does not exist yet
-  std::cout << input << " : command not found\n";
+  std::cout << input << ": command not found\n";
 }
 
 int main() {
