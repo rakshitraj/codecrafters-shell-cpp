@@ -3,6 +3,9 @@
 #include <set>
 #include <map>
 #include <functional>
+#include <vector>
+#include <sstream>
+#include <utility>
 
 // Predefined command return
 enum CommandResult {
@@ -11,21 +14,56 @@ enum CommandResult {
   COMMAND_UNRECOGNIZED
 };
 
+// helper funtions
+std::pair<std::string, std::vector<std::string>> parse_input(const std::string& input){
+  std::vector<std::string> parts;
+  std::istringstream stream(input);
+  std::string word;
+
+  while (stream >> word){
+    parts.push_back(word);
+  }
+  
+  // Command
+  std::string command = parts[0];
+  std::vector<std::string> arguments;
+
+  // Remove command to get list of arguments
+  if (!parts.empty()) {
+    parts.erase(parts.begin());
+    arguments = parts;
+  }
+  else {
+    arguments = {};
+  }
+
+  std::pair<std::string, std::vector<std::string>> parsed;
+  parsed.first = command;
+  parsed.second = arguments;
+
+  return parsed;
+}
+
 // Functions that define command behaviour
 
-CommandResult cmd__exit(const std::string& input){
-  std::exit(EXIT_SUCCESS);
+CommandResult cmd__exit(const std::vector<std::string>& args){
+  if (args.size() != 1){
+    std::cout << "ArgumentError: exit takes exactly 1 argument\n";
+    return COMMAND_FAILURE;
+  }
+  int args__exit_status = std::stoi(args[0]);
+  std::exit(args__exit_status);
 }
 
 CommandResult cmd__okay(){
-  std::cout<< "All okay!\n";
+  std::cout << "All okay!\n";
   return COMMAND_SUCCESS;
 }
 
 // Map of known commands and their implementaion
-std::map<std::string, std::function<CommandResult(const std::string&)>> command_map {
+std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
   {"exit", cmd__exit},
-  {"okay", [](const std::string& input){return cmd__okay();}}
+  {"okay", [](const std::vector<std::string>&){return cmd__okay();}}
 };
 
 // REPL
@@ -41,9 +79,15 @@ void read_input(std::string& input){
 
 
 CommandResult do_command(const std::string& input){
-  std::map<std::string, std::function<CommandResult(const std::string&)>>::iterator it = command_map.find(input);
+  std::pair<std::string, std::vector<std::string>> parsed_pair = parse_input(input);
+
+  std::string command = parsed_pair.first;
+  std::vector<std::string> arguments = parsed_pair.second;
+
+  std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>>::iterator it = command_map.find(command);
+  
   if (it != command_map.end()) {
-    it->second(input);
+    return it->second(arguments);
   }
   else {
     return COMMAND_UNRECOGNIZED;
@@ -65,6 +109,8 @@ int main() {
     switch (do_command(input))
     {
       case COMMAND_SUCCESS:
+        continue;
+      case COMMAND_FAILURE:
         continue;
       case COMMAND_UNRECOGNIZED:
         std::cout << input << ": command not found\n";
