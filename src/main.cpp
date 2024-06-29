@@ -17,10 +17,15 @@ CommandResult cmd__exit(const std::string& input){
   std::exit(EXIT_SUCCESS);
 }
 
+CommandResult cmd__okay(){
+  std::cout<< "All okay!\n";
+  return COMMAND_SUCCESS;
+}
 
 // Map of known commands and their implementaion
 std::map<std::string, std::function<CommandResult(const std::string&)>> command_map {
-  {"exit", cmd__exit}
+  {"exit", cmd__exit},
+  {"okay", [](const std::string& input){return cmd__okay();}}
 };
 
 // REPL
@@ -62,7 +67,7 @@ int main() {
       case COMMAND_SUCCESS:
         continue;
       case COMMAND_UNRECOGNIZED:
-        std::cout << input << ": command not recognized\n";
+        std::cout << input << ": command not found\n";
         continue;
       default:
         std::cout << "unknown state\n";
