@@ -14,8 +14,32 @@ enum CommandResult {
   COMMAND_UNRECOGNIZED
 };
 
+// Funtion prototypes
+// Helper function for commands
+std::pair<std::string, std::vector<std::string>> parse_input(const std::string&);
+// These funtions define command behaviour
+CommandResult metaCommand();
+CommandResult cmd__exit(const std::vector<std::string>&);
+CommandResult cmd__okay();
+CommandResult cmd__echo(const std::vector<std::string>&);
+CommandResult cmd__type(const std::vector<std::string>&);
+
+// Command map
+std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
+  {"", [](const std::vector<std::string>&){return COMMAND_SUCCESS;}}, // meta-command for blank input
+  {"okay", [](const std::vector<std::string>&){return cmd__okay();}},
+  {"exit", cmd__exit},
+  {"echo", cmd__echo},
+  {"type", cmd__type}
+};
+
+
 // helper funtions
 std::pair<std::string, std::vector<std::string>> parse_input(const std::string& input){
+  if (input.size() == 0 or input[0] == '\n') {
+    return std::make_pair((std::string)"", std::vector<std::string>());
+  }
+
   std::vector<std::string> parts;
   std::istringstream stream(input);
   std::string word;
@@ -72,12 +96,22 @@ CommandResult cmd__echo(const std::vector<std::string>& args){
   return COMMAND_SUCCESS;
 }
 
-// Map of known commands and their implementaion
-std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
-  {"exit", cmd__exit},
-  {"okay", [](const std::vector<std::string>&){return cmd__okay();}},
-  {"echo", cmd__echo}
-};
+
+CommandResult cmd__type(const std::vector<std::string>& args){
+  if (args.size() != 1){
+    std::cout << "ArgumentError: type takes exactly 1 argument\n";
+    return COMMAND_FAILURE;
+  }
+  else {
+    if(command_map.find(args[0]) != command_map.end()){
+      std::cout << args[0] << " is a shell builtin\n";
+    }
+    else std::cout << args[0] << ": not found\n";
+
+    return COMMAND_SUCCESS;
+  }
+}
+
 
 // REPL
 
