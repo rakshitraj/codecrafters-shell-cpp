@@ -60,10 +60,23 @@ CommandResult cmd__okay(){
   return COMMAND_SUCCESS;
 }
 
+CommandResult cmd__echo(const std::vector<std::string>& args){
+  auto start = args.begin();
+  auto stop = args.end();
+  for (auto it = start; it != stop; ++it) {
+    std::cout << *it;
+    if (it + 1 != stop) std::cout << " ";
+  }
+  std::cout << '\n';
+
+  return COMMAND_SUCCESS;
+}
+
 // Map of known commands and their implementaion
 std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
   {"exit", cmd__exit},
-  {"okay", [](const std::vector<std::string>&){return cmd__okay();}}
+  {"okay", [](const std::vector<std::string>&){return cmd__okay();}},
+  {"echo", cmd__echo}
 };
 
 // REPL
