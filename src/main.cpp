@@ -18,6 +18,7 @@ enum CommandResult {
 // Funtion prototypes
 // Helper function for commands
 std::pair<std::string, std::vector<std::string>> parse_input(const std::string&);
+std::vector<std::string> list_files_in_path(const std::string&);
 std::pair<bool, std::string> exists_in_path(const std::string&);
 // These funtions define command behaviour
 CommandResult metaCommand();
@@ -74,11 +75,16 @@ std::pair<std::string, std::vector<std::string>> parse_input(const std::string& 
 std::vector<std::string> list_files_in_path(const std::string& path){
   std::vector<std::string> files;
 
-  std::filesystem::path dir{path};
-  for(auto const& dir_entry : std::filesystem::directory_iterator{dir}){
-    files.push_back(dir_entry.path());
+  try {
+    std::filesystem::path dir{path};
+    for(auto const& dir_entry : std::filesystem::directory_iterator{dir}){
+      files.push_back(dir_entry.path());
+    }
   }
-
+  catch (const std::exception& e) {
+    files = {};
+  }
+  
   return files;
 }
 
@@ -91,6 +97,7 @@ std::pair<bool, std::string> exists_in_path(const std::string& input) {
   // Convert char* to std::string
   std::string path(path_env_var);
 
+  // Get all parts of PATH
   std::vector<std::string> parts;
   std::string part;
   std::istringstream stream(path);
@@ -100,6 +107,7 @@ std::pair<bool, std::string> exists_in_path(const std::string& input) {
     parts.push_back(part);
   }
 
+  // Check if input exists in these PATH folders - list all path folders and match with content - linear search
   for (auto el : parts){
     std::string key = el + "/" + input;
     std::vector<std::string> files = list_files_in_path(el);
