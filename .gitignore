@@ -50,3 +50,7 @@ vcpkg_installed
 
 # IDE
 .vscode/
+
+# Build
+build/
+main

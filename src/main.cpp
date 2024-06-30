@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <utility>
+#include <filesystem>
 
 // Predefined command return
 enum CommandResult {
@@ -17,6 +18,7 @@ enum CommandResult {
 // Funtion prototypes
 // Helper function for commands
 std::pair<std::string, std::vector<std::string>> parse_input(const std::string&);
+std::pair<bool, std::string> exists_in_path(const std::string&);
 // These funtions define command behaviour
 CommandResult metaCommand();
 CommandResult cmd__exit(const std::vector<std::string>&);
@@ -68,6 +70,50 @@ std::pair<std::string, std::vector<std::string>> parse_input(const std::string& 
   return parsed;
 }
 
+
+std::vector<std::string> list_files_in_path(const std::string& path){
+  std::vector<std::string> files;
+
+  std::filesystem::path dir{path};
+  for(auto const& dir_entry : std::filesystem::directory_iterator{dir}){
+    files.push_back(dir_entry.path());
+  }
+
+  return files;
+}
+
+
+std::pair<bool, std::string> exists_in_path(const std::string& input) {
+  // Get environment variable PATH
+  const char* path_env_var = std::getenv("PATH");
+  if(path_env_var == nullptr) std::exit(EXIT_FAILURE);
+
+  // Convert char* to std::string
+  std::string path(path_env_var);
+
+  std::vector<std::string> parts;
+  std::string part;
+  std::istringstream stream(path);
+  char delimiter = ':';
+
+  while (std::getline(stream, part, delimiter)) {
+    parts.push_back(part);
+  }
+
+  for (auto el : parts){
+    std::string key = el + "/" + input;
+    std::vector<std::string> files = list_files_in_path(el);
+    for (auto el : files) {
+      if (key.compare(el) == 0){
+        return std::make_pair(true, key);
+      }
+    }
+  }
+
+  return std::make_pair(false, std::string(""));
+}
+
+
 // Functions that define command behaviour
 
 CommandResult cmd__exit(const std::vector<std::string>& args){
@@ -106,12 +152,16 @@ CommandResult cmd__type(const std::vector<std::string>& args){
     if(command_map.find(args[0]) != command_map.end()){
       std::cout << args[0] << " is a shell builtin\n";
     }
-    else std::cout << args[0] << ": not found\n";
-
+    else {
+      auto check_in_path = exists_in_path(args[0]);
+      if(check_in_path.first) {
+        std::cout << args[0] << " is " << check_in_path.second << "\n";
+      }
+      else std::cout << args[0] << ": not found\n";
+    }
     return COMMAND_SUCCESS;
   }
 }
-
 
 // REPL
 
