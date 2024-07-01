@@ -178,7 +178,7 @@ CommandResult builtin_type(const std::vector<std::string>& args){
 
 
 CommandResult builtin_pwd(){
-  std::cout << std::filesystem::current_path() << '\n';
+  std::cout << std::string(std::filesystem::current_path()) << '\n';
   return COMMAND_SUCCESS;
 }
 // REPL
