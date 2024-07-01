@@ -35,5 +35,5 @@ Note: This section is for stages 2 and beyond.
    to CodeCrafters. Test output will be streamed to your terminal.
 
 
-Check POSIX-compliant shell, [here.](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.htm)
+Check POSIX-compliant shell, [here.](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
 
