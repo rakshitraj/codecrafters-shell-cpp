@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <set>
@@ -191,11 +192,22 @@ CommandResult do_command(const std::string& input){
 
   std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>>::iterator it = command_map.find(command);
   
-  if (it != command_map.end()) {
+  if (it != command_map.end()) { // shell builtin
     return it->second(arguments);
   }
-  else {
-    return COMMAND_UNRECOGNIZED;
+  else {  // executable from path
+    auto is_executable = exists_in_path(command);
+    if (is_executable.first) {
+      auto pos_whitespace = input.find_first_of(' ');
+      std::string executable;
+      if (pos_whitespace != std::string::npos) executable = is_executable.second + input.substr(pos_whitespace);
+      else executable = is_executable.second;
+      std::system(executable.c_str());
+      return COMMAND_SUCCESS;
+    }
+    else {
+      return COMMAND_UNRECOGNIZED;
+    }
   }
 }
 
