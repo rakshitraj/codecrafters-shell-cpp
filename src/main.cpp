@@ -23,18 +23,20 @@ std::vector<std::string> list_files_in_path(const std::string&);
 std::pair<bool, std::string> exists_in_path(const std::string&);
 // These funtions define command behaviour
 CommandResult metaCommand();
-CommandResult cmd__exit(const std::vector<std::string>&);
-CommandResult cmd__okay();
-CommandResult cmd__echo(const std::vector<std::string>&);
-CommandResult cmd__type(const std::vector<std::string>&);
+CommandResult builtin_exit(const std::vector<std::string>&);
+CommandResult builtin_okay();
+CommandResult builtin_echo(const std::vector<std::string>&);
+CommandResult builtin_type(const std::vector<std::string>&);
+CommandResult builtin_pwd();
 
 // Command map
 std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
   {"", [](const std::vector<std::string>&){return COMMAND_SUCCESS;}}, // meta-command for blank input
-  {"okay", [](const std::vector<std::string>&){return cmd__okay();}},
-  {"exit", cmd__exit},
-  {"echo", cmd__echo},
-  {"type", cmd__type}
+  {"okay", [](const std::vector<std::string>&){return builtin_okay();}},
+  {"exit", builtin_exit},
+  {"echo", builtin_echo},
+  {"type", builtin_type},
+  {"pwd", [](const std::vector<std::string>&){return builtin_pwd();}}
 };
 
 
@@ -125,7 +127,7 @@ std::pair<bool, std::string> exists_in_path(const std::string& input) {
 
 // Functions that define command behaviour
 
-CommandResult cmd__exit(const std::vector<std::string>& args){
+CommandResult builtin_exit(const std::vector<std::string>& args){
   if (args.size() != 1){
     std::cout << "ArgumentError: exit takes exactly 1 argument\n";
     return COMMAND_FAILURE;
@@ -134,12 +136,14 @@ CommandResult cmd__exit(const std::vector<std::string>& args){
   std::exit(args__exit_status);
 }
 
-CommandResult cmd__okay(){
+
+CommandResult builtin_okay(){
   std::cout << "All okay!\n";
   return COMMAND_SUCCESS;
 }
 
-CommandResult cmd__echo(const std::vector<std::string>& args){
+
+CommandResult builtin_echo(const std::vector<std::string>& args){
   auto start = args.begin();
   auto stop = args.end();
   for (auto it = start; it != stop; ++it) {
@@ -152,7 +156,7 @@ CommandResult cmd__echo(const std::vector<std::string>& args){
 }
 
 
-CommandResult cmd__type(const std::vector<std::string>& args){
+CommandResult builtin_type(const std::vector<std::string>& args){
   if (args.size() != 1){
     std::cout << "ArgumentError: type takes exactly 1 argument\n";
     return COMMAND_FAILURE;
@@ -172,6 +176,11 @@ CommandResult cmd__type(const std::vector<std::string>& args){
   }
 }
 
+
+CommandResult builtin_pwd(){
+  std::cout << std::filesystem::current_path() << '\n';
+  return COMMAND_SUCCESS;
+}
 // REPL
 
 void print_prompt() {
