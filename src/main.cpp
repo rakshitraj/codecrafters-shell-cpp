@@ -192,7 +192,7 @@ CommandResult builtin_cd(const std::vector<std::string>& args) {
     return COMMAND_SUCCESS;
   }
   else {
-    std::cout << "cd: " << args[0] << ": no such file or directory\n";
+    std::cout << "cd: " << args[0] << ": No such file or directory\n";
     return COMMAND_FAILURE;
   }
   
