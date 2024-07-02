@@ -185,9 +185,17 @@ CommandResult builtin_pwd(){
 }
 
 CommandResult builtin_cd(const std::vector<std::string>& args) {
-  std::filesystem::path p = args[0];
-  std::filesystem::current_path(p);
-  return COMMAND_SUCCESS;
+  std::filesystem::directory_entry path{args[0]};
+  if (path.exists()) {
+    std::filesystem::path p = args[0];
+    std::filesystem::current_path(p);
+    return COMMAND_SUCCESS;
+  }
+  else {
+    std::cout << "cd: " << args[0] << ": no such file or directory\n";
+    return COMMAND_FAILURE;
+  }
+  
 }
 // REPL
 
