@@ -28,6 +28,7 @@ CommandResult builtin_okay();
 CommandResult builtin_echo(const std::vector<std::string>&);
 CommandResult builtin_type(const std::vector<std::string>&);
 CommandResult builtin_pwd();
+CommandResult builtin_cd(const std::vector<std::string>&);
 
 // Command map
 std::map<std::string, std::function<CommandResult(const std::vector<std::string>&)>> command_map {
@@ -36,7 +37,8 @@ std::map<std::string, std::function<CommandResult(const std::vector<std::string>
   {"exit", builtin_exit},
   {"echo", builtin_echo},
   {"type", builtin_type},
-  {"pwd", [](const std::vector<std::string>&){return builtin_pwd();}}
+  {"pwd", [](const std::vector<std::string>&){return builtin_pwd();}},
+  {"cd", builtin_cd}
 };
 
 
@@ -179,6 +181,12 @@ CommandResult builtin_type(const std::vector<std::string>& args){
 
 CommandResult builtin_pwd(){
   std::cout << std::string(std::filesystem::current_path()) << '\n';
+  return COMMAND_SUCCESS;
+}
+
+CommandResult builtin_cd(const std::vector<std::string>& args) {
+  std::filesystem::path p = args[0];
+  std::filesystem::current_path(p);
   return COMMAND_SUCCESS;
 }
 // REPL
