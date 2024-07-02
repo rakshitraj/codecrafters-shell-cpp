@@ -185,10 +185,26 @@ CommandResult builtin_pwd(){
 }
 
 CommandResult builtin_cd(const std::vector<std::string>& args) {
-  std::filesystem::directory_entry path{args[0]};
-  if (path.exists()) {
-    std::filesystem::path p = args[0];
-    std::filesystem::current_path(p);
+  if (args.size() != 1){
+    std::cout << "ArgumentError: cd takes exactly 1 argument\n";
+    return COMMAND_FAILURE;
+  }
+
+  std::string path = args[0];
+
+  if (path == "~"){
+    const char* home = std::getenv("HOME");
+    if (!home){
+      std::cerr << "cd: HOME environment variable not set";
+      return COMMAND_FAILURE;
+    }
+    path = home;
+  }
+
+  std::filesystem::directory_entry de{path};
+  
+  if (de.exists()) {
+    std::filesystem::current_path(de.path());
     return COMMAND_SUCCESS;
   }
   else {
