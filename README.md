@@ -1,39 +1,85 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/9cde6b42-ca9b-4da5-951e-89ffe1082e55)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# POSIX Shell Implementation
 
-This is a starting point for C++ solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+This is a basic implementation of a shell in C++. It provides a command-line interface with several built-in commands and the ability to execute external programs.
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+## Overview
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+The shell implements a Read-Eval-Print Loop (REPL) that:
+1. Displays a prompt
+2. Reads user input
+3. Parses the input into a command and arguments
+4. Executes the command
+5. Repeats
 
-# Passing the first stage
+Built-in commands are handled directly by the shell, while external commands are executed by searching the system PATH.
 
-The entry point for your `shell` implementation is in `src/main.cpp`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+## Build Instructions
 
-```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
+To build the shell, you'll need:
+- A C++ compiler supporting C++17 (e.g., GCC 7+ or Clang 5+)
+- The standard C++ library
+
+Follow these steps to build the shell:
+
+```
+g++ -std=c++17 main.cpp -o simple_shell
 ```
 
-Time to move on to the next stage!
+This will create an executable named `main` in the current directory.
 
-# Stage 2 & beyond
+## Execution Instructions
 
-Note: This section is for stages 2 and beyond.
+To run the shell:
 
-1. Ensure you have `cmake` installed locally
-1. Run `./your_shell.sh` to run your program, which is implemented in
-   `src/main.cpp`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+1. Open a terminal
+2. Navigate to the directory containing the `simple_shell` executable
+3. Run the following command:
 
+```
+./main
+```
 
-Check POSIX-compliant shell, [here.](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+You should now see the shell prompt `$`, indicating that the shell is ready to accept commands.
 
+## Available Commands
+
+The shell supports the following built-in commands:
+
+1. `okay`: Prints "All okay!"
+2. `exit [status]`: Exits the shell with the provided status code
+3. `echo [args...]`: Prints the provided arguments
+4. `type [command]`: Identifies whether a command is a shell builtin or an external program
+5. `pwd`: Prints the current working directory
+6. `cd [directory]`: Changes the current working directory
+
+In addition to these built-in commands, the shell can execute any external programs available in the system PATH.
+
+## Usage Examples
+
+```
+$ okay
+All okay!
+
+$ echo Hello, World!
+Hello, World!
+
+$ pwd
+/home/user/current/directory
+
+$ cd ..
+$ pwd
+/home/user/current
+
+$ type echo
+echo is a shell builtin
+
+$ type ls
+ls is /bin/ls
+
+$ ls
+file1.txt file2.txt directory1
+
+$ exit 0
+```
+
+**Note: The actual output may vary depending on your system configuration and current directory contents.**
